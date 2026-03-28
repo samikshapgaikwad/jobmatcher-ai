@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: jobmatch-embedding-service
+    runtime: python
+    pythonVersion: "3.11"
+    buildCommand: pip install -r requirements.txt && python -m spacy download en_core_web_sm
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: EMBEDDING_MODEL
+        value: "all-MiniLM-L6-v2"
+      - key: BATCH_INTERVAL_MINUTES
+        value: "5"
+      - key: PIPELINE_RUN_TIME
+        value: "02:00"
+      - key: ADZUNA_APP_ID
+        sync: false
+      - key: ADZUNA_APP_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        value: "*"
