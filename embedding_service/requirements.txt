@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+sentence-transformers
+spacy
+pymupdf
+python-docx
+supabase
+python-dotenv
+apscheduler
+python-multipart

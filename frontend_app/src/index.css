@@ -1,0 +1,144 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@layer base {
+  :root {
+    --background: 222 47% 11%;
+    --foreground: 213 31% 91%;
+
+    --card: 217 33% 13%;
+    --card-foreground: 213 31% 91%;
+
+    --popover: 217 33% 13%;
+    --popover-foreground: 213 31% 91%;
+
+    --primary: 239 84% 67%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 168 76% 42%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 55%;
+
+    --accent: 239 84% 67%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 217 33% 20%;
+    --input: 217 33% 20%;
+    --ring: 239 84% 67%;
+
+    --radius: 1rem;
+
+    --sidebar-background: 222 47% 9%;
+    --sidebar-foreground: 213 31% 75%;
+    --sidebar-primary: 239 84% 67%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 217 33% 15%;
+    --sidebar-accent-foreground: 213 31% 91%;
+    --sidebar-border: 217 33% 17%;
+    --sidebar-ring: 239 84% 67%;
+
+    /* Custom tokens */
+    --glass-bg: 217 33% 14%;
+    --glass-border: 217 33% 22%;
+    --glow-primary: 239 84% 67%;
+    --glow-secondary: 168 76% 42%;
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+
+  code, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-card/60 backdrop-blur-xl border border-white/[0.06] rounded-2xl;
+  }
+
+  .glass-panel-hover {
+    @apply glass-panel transition-all duration-300;
+  }
+
+  .glass-panel-hover:hover {
+    @apply border-white/[0.12] shadow-[0_0_30px_-5px_hsl(var(--glow-primary)/0.15)];
+    transform: translateY(-2px) scale(1.01);
+  }
+
+  .glow-border {
+    @apply border border-primary/20;
+    box-shadow: 0 0 20px -5px hsl(var(--glow-primary) / 0.2);
+  }
+
+  .glow-teal {
+    box-shadow: 0 0 20px -5px hsl(var(--glow-secondary) / 0.3);
+  }
+
+  .status-dot {
+    @apply w-2 h-2 rounded-full bg-secondary;
+    box-shadow: 0 0 8px hsl(var(--glow-secondary) / 0.6);
+  }
+
+  .drop-zone {
+    @apply glass-panel border-2 border-dashed border-primary/30 rounded-2xl flex flex-col items-center justify-center gap-3 cursor-pointer transition-all duration-300;
+  }
+
+  .drop-zone:hover {
+    @apply border-primary/60 bg-primary/5;
+  }
+
+  .tag-skill {
+    @apply px-2.5 py-1 rounded-lg text-xs font-medium bg-primary/10 text-primary border border-primary/20;
+  }
+
+  .tag-teal {
+    @apply px-2.5 py-1 rounded-lg text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20;
+  }
+
+  .tag-danger {
+    @apply px-2.5 py-1 rounded-lg text-xs font-medium bg-destructive/10 text-destructive border border-destructive/20;
+  }
+}
+
+@layer utilities {
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 15px -3px hsl(var(--glow-primary) / 0.3); }
+    50% { box-shadow: 0 0 30px -3px hsl(var(--glow-primary) / 0.5); }
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .skeleton-shimmer {
+    background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted-foreground) / 0.08) 50%, hsl(var(--muted)) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+}
