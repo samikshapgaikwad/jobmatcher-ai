@@ -1,10 +1,12 @@
 fastapi
 uvicorn
-sentence-transformers
+python-multipart
+sentence-transformers==3.3.1
+transformers==4.47.0
 spacy
-pymupdf
-python-docx
-supabase
+supabase==2.7.4
 python-dotenv
 apscheduler
-python-multipart
+pymupdf
+python-docx
+websockets==13.1

@@ -1,9 +1,10 @@
 fastapi
 uvicorn
+langgraph
 langchain
 langchain-groq
 langchain-core
-langgraph
-supabase
+supabase==2.7.4
 python-dotenv
 pydantic
+websockets==13.1
