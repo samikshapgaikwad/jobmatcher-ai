@@ -1,9 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import match, cover_letter, explain
-from config import CORS_ORIGINS
 from dotenv import load_dotenv
-from routers import match, cover_letter, explain, chat  # add chat          # add this line
+from routers import match, cover_letter, explain, chat
 
 load_dotenv()
 
@@ -11,11 +9,8 @@ app = FastAPI(title="JobMatch AI — Matching API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://jobmatcher-ai.onrender.com",
-        "http://localhost:5173"
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -23,7 +18,7 @@ app.add_middleware(
 app.include_router(match.router, prefix="/api")
 app.include_router(cover_letter.router, prefix="/api")
 app.include_router(explain.router, prefix="/api")
-app.include_router(chat.router, prefix="/api") 
+app.include_router(chat.router, prefix="/api")
 
 @app.get("/health")
 def health():
