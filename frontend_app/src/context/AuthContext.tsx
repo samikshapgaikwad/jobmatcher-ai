@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: "http://localhost:8080"
+        redirectTo: "https://jobmatch-ai.vercel.app"
       }
     });
     if (error) console.error("Google sign in error:", error.message);
