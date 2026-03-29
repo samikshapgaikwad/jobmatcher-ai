@@ -11,10 +11,15 @@ app = FastAPI(title="JobMatch AI — Matching API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:8080", "http://localhost:3000"],
+    allow_origins=[
+        "https://jobmatcher-ai.onrender.com",
+        "http://localhost:5173"
+    ],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 app.include_router(match.router, prefix="/api")
 app.include_router(cover_letter.router, prefix="/api")
 app.include_router(explain.router, prefix="/api")
