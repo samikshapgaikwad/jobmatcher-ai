@@ -1,17 +1,19 @@
-import { MapPin, ExternalLink, Bookmark, BookmarkCheck } from "lucide-react";
+import { MapPin, ExternalLink, Bookmark, BookmarkCheck, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 import MatchScoreRing from "./MatchScoreRing";
 import { Job } from "@/types/job";
 import { useSavedJobs } from "@/pages/SavedJobs";
-import { cn } from "@/lib/utils";
 
 interface JobCardProps {
   job: Job;
   index: number;
   onSelect: (job: Job) => void;
+  onApply?: (jobId: number) => void;
+  isApplied?: boolean;
 }
 
-const JobCard = ({ job, index, onSelect }: JobCardProps) => {
+const JobCard = ({ job, index, onSelect, onApply, isApplied = false }: JobCardProps) => {
   const { saveJob, removeJob, isSaved } = useSavedJobs();
   const saved = isSaved(job.id);
 
@@ -20,7 +22,10 @@ const JobCard = ({ job, index, onSelect }: JobCardProps) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.08, ease: "easeOut" }}
-      className="glass-panel-hover p-5 cursor-pointer"
+      className={cn(
+        "glass-panel-hover p-5 cursor-pointer",
+        isApplied && "opacity-60"
+      )}
       onClick={() => onSelect(job)}
     >
       <div className="flex items-start justify-between gap-4">
@@ -47,6 +52,11 @@ const JobCard = ({ job, index, onSelect }: JobCardProps) => {
             <span className="tag-skill">Exp: {job.experience_match_pct}%</span>
             {job.missing_skills.length > 0 && (
               <span className="tag-danger">{job.missing_skills.length} gaps</span>
+            )}
+            {isApplied && (
+              <span className="tag-teal flex items-center gap-1">
+                <CheckCircle size={10} /> Applied
+              </span>
             )}
           </div>
         </div>
@@ -81,7 +91,10 @@ const JobCard = ({ job, index, onSelect }: JobCardProps) => {
           href={job.link}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            onApply?.(job.id); // mark as applied when clicking Apply
+          }}
           className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium border border-border text-muted-foreground hover:text-foreground hover:border-primary/30 transition-colors"
         >
           Apply <ExternalLink size={11} />

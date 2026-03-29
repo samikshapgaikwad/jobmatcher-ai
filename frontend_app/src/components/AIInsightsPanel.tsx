@@ -10,9 +10,10 @@ interface AIInsightsPanelProps {
   job: Job | null;
   userId: string;
   onClose: () => void;
+  onApply?: (jobId: number) => void;
 }
 
-const AIInsightsPanel = ({ job, userId, onClose }: AIInsightsPanelProps) => {
+const AIInsightsPanel = ({ job, userId, onClose, onApply }: AIInsightsPanelProps) => {
   const [coverLetter, setCoverLetter] = useState<string | null>(null);
   const [loadingCover, setLoadingCover] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -47,6 +48,7 @@ const AIInsightsPanel = ({ job, userId, onClose }: AIInsightsPanelProps) => {
     <AnimatePresence>
       {job && (
         <>
+          {/* Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -55,6 +57,7 @@ const AIInsightsPanel = ({ job, userId, onClose }: AIInsightsPanelProps) => {
             onClick={handleClose}
           />
 
+          {/* Panel */}
           <motion.div
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
@@ -69,7 +72,9 @@ const AIInsightsPanel = ({ job, userId, onClose }: AIInsightsPanelProps) => {
                   AI Analysis
                 </p>
                 <h2 className="text-lg font-semibold text-foreground">{job.title}</h2>
-                <p className="text-sm text-muted-foreground">{job.company} · {job.location}</p>
+                <p className="text-sm text-muted-foreground">
+                  {job.company} · {job.location}
+                </p>
               </div>
               <button
                 onClick={handleClose}
@@ -80,7 +85,6 @@ const AIInsightsPanel = ({ job, userId, onClose }: AIInsightsPanelProps) => {
             </div>
 
             <div className="p-5 space-y-6">
-
               {/* Score */}
               <div className="glass-panel p-5 flex items-center gap-5">
                 <MatchScoreRing score={job.match_score} size={80} />
@@ -141,15 +145,20 @@ const AIInsightsPanel = ({ job, userId, onClose }: AIInsightsPanelProps) => {
               </div>
 
               {/* Missing Skills */}
-              {/* Missing Skills */}
               {job.missing_skills.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold text-foreground mb-3">Missing Skills</h3>
+                  <h3 className="text-sm font-semibold text-foreground mb-3">
+                    Missing Skills
+                  </h3>
                   <div className="space-y-2">
                     {job.missing_skills.map((skill, i) => (
-                      <div key={i} className="glass-panel p-3 flex items-center justify-between">
+                      <div
+                        key={i}
+                        className="glass-panel p-3 flex items-center justify-between"
+                      >
                         <span className="text-sm text-foreground">{skill}</span>
 
+                        {/* FIXED LINK */}
                         <a
                           href={`https://www.google.com/search?q=learn+${encodeURIComponent(skill)}`}
                           target="_blank"
@@ -163,6 +172,7 @@ const AIInsightsPanel = ({ job, userId, onClose }: AIInsightsPanelProps) => {
                   </div>
                 </div>
               )}
+
               {/* Cover Letter */}
               <div>
                 <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
@@ -177,9 +187,13 @@ const AIInsightsPanel = ({ job, userId, onClose }: AIInsightsPanelProps) => {
                     className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium border border-primary/30 text-primary hover:bg-primary/10 transition-colors disabled:opacity-50"
                   >
                     {loadingCover ? (
-                      <><Loader2 size={14} className="animate-spin" /> Generating...</>
+                      <>
+                        <Loader2 size={14} className="animate-spin" /> Generating...
+                      </>
                     ) : (
-                      <><FileText size={14} /> Generate Cover Letter</>
+                      <>
+                        <FileText size={14} /> Generate Cover Letter
+                      </>
                     )}
                   </button>
                 ) : (
@@ -198,19 +212,20 @@ const AIInsightsPanel = ({ job, userId, onClose }: AIInsightsPanelProps) => {
               </div>
 
               {/* Apply Button */}
-              {/* Apply Button */}
               {job.link && (
                 <a
                   href={job.link}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => onApply?.(job.id)}
                   className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                 >
                   Apply Now <ExternalLink size={14} />
                 </a>
               )}
+
               {/* Chat */}
-                  <JobChat job={job} userId={userId} />
+              <JobChat job={job} userId={userId} />
             </div>
           </motion.div>
         </>
