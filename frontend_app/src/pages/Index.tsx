@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ResumeCommandCenter from "@/components/ResumeCommandCenter";
 import JobCard from "@/components/JobCard";
 import JobCardSkeleton from "@/components/JobCardSkeleton";
@@ -7,16 +7,40 @@ import { useMatching } from "@/hooks/use-matching";
 import { useAuth } from "@/context/AuthContext";
 import { Job } from "@/types/job";
 
+const RESUME_KEY = "jobmatch_resume_uploaded";
+
 const Index = () => {
   const { user } = useAuth();
   const USER_ID = user?.id ?? "";
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const { jobs, loading, error, resumeName, runMatching } = useMatching(USER_ID);
 
+  // Persist resume uploaded state in localStorage
+  const [resumeUploaded, setResumeUploaded] = useState(() => {
+    return localStorage.getItem(RESUME_KEY) === "true";
+  });
+
+  const handleResumeReady = () => {
+    localStorage.setItem(RESUME_KEY, "true");
+    setResumeUploaded(true);
+    runMatching();
+  };
+
+  // Auto-run matching if resume was previously uploaded
+  useEffect(() => {
+    if (resumeUploaded && USER_ID && jobs.length === 0) {
+      runMatching();
+    }
+  }, [USER_ID]);
+
   return (
     <div className="p-6 flex gap-6">
       <div className="w-72 shrink-0">
-        <ResumeCommandCenter userId={USER_ID} onResumeReady={runMatching} />
+        <ResumeCommandCenter
+          userId={USER_ID}
+          onResumeReady={handleResumeReady}
+          resumeUploaded={resumeUploaded}
+        />
       </div>
 
       <div className="flex-1">
