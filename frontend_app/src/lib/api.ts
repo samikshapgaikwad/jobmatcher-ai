@@ -1,14 +1,10 @@
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 
-export async function fetchMatches(userId: string): Promise<{
-  jobs: Job[];
-  resume_name: string;
-  total_found: number;
-}> {
+export async function fetchMatches(userId: string, topK: number = 20) {
   const res = await fetch(`${API_BASE}/match`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ user_id: userId, top_k: 10 }),
+    body: JSON.stringify({ user_id: userId, top_k: topK }),
   });
   if (!res.ok) throw new Error("Failed to fetch matches");
   return res.json();

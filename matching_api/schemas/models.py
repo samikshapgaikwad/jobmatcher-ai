@@ -3,7 +3,7 @@ from typing import List, Optional
 
 class MatchRequest(BaseModel):
     user_id: str
-    top_k: int = 10
+    top_k: int = 30
 
 class JobMatch(BaseModel):
     id: int

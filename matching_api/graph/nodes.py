@@ -123,7 +123,7 @@ def analyze_gaps(state: AgentState) -> AgentState:
             continue
 
     final_jobs.sort(key=lambda x: x.get("match_score", 0), reverse=True)
-    return {**state, "final_jobs": final_jobs[:10]}
+    return {**state, "final_jobs": final_jobs[:30]}
 
 
 def should_retry(state: AgentState) -> str:

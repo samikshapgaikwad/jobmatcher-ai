@@ -5,7 +5,6 @@ import JobCardSkeleton from "@/components/JobCardSkeleton";
 import AIInsightsPanel from "@/components/AIInsightsPanel";
 import { useMatching } from "@/hooks/use-matching";
 import { useAuth } from "@/context/AuthContext";
-import { useAppliedJobs } from "@/hooks/use-appliedjobs";
 import { Job } from "@/types/job";
 
 const RESUME_KEY = "jobmatch_resume_uploaded";
@@ -14,9 +13,15 @@ const Index = () => {
   const { user } = useAuth();
   const USER_ID = user?.id ?? "";
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
-  const { jobs, loading, error, resumeName, runMatching } = useMatching(USER_ID);
-  const { markApplied, isApplied } = useAppliedJobs();
-  const [showApplied, setShowApplied] = useState(false);
+  const {
+    jobs,
+    queueSize,
+    loading,
+    error,
+    resumeName,
+    runMatching,
+    removeJob
+  } = useMatching(USER_ID);
 
   const [resumeUploaded, setResumeUploaded] = useState(() => {
     return localStorage.getItem(RESUME_KEY) === "true";
@@ -28,18 +33,30 @@ const Index = () => {
     runMatching();
   };
 
+  const handleApply = (jobId: number) => {
+    // Save to applied list
+    const existing = JSON.parse(
+      localStorage.getItem("jobmatch_applied_jobs") || "[]"
+    );
+    if (!existing.includes(jobId)) {
+      localStorage.setItem(
+        "jobmatch_applied_jobs",
+        JSON.stringify([...existing, jobId])
+      );
+    }
+    // Remove from visible and pull next from queue
+    removeJob(jobId);
+    // Close panel if the applied job was selected
+    if (selectedJob?.id === jobId) {
+      setSelectedJob(null);
+    }
+  };
+
   useEffect(() => {
     if (resumeUploaded && USER_ID && jobs.length === 0) {
       runMatching();
     }
   }, [USER_ID]);
-
-  // Filter out applied jobs unless user wants to see them
-  const visibleJobs = showApplied
-    ? jobs
-    : jobs.filter(job => !isApplied(job.id));
-
-  const appliedCount = jobs.filter(job => isApplied(job.id)).length;
 
   return (
     <div className="p-6 flex gap-6">
@@ -49,6 +66,15 @@ const Index = () => {
           onResumeReady={handleResumeReady}
           resumeUploaded={resumeUploaded}
         />
+
+        {/* Queue indicator */}
+        {queueSize > 0 && (
+          <div className="mt-4 glass-panel p-3 text-center">
+            <p className="text-xs text-muted-foreground">
+              <span className="text-primary font-medium">{queueSize}</span> more matches ready
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="flex-1">
@@ -63,44 +89,57 @@ const Index = () => {
                 : error
                 ? error
                 : jobs.length > 0
-                ? `${visibleJobs.length} positions found for ${resumeName}`
+                ? `${jobs.length} positions · ${queueSize} more in queue`
+                : resumeUploaded
+                ? "No matches found — try refreshing"
                 : "Upload your resume to see matches"}
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            {appliedCount > 0 && (
-              <button
-                onClick={() => setShowApplied(!showApplied)}
-                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {showApplied ? "Hide" : "Show"} {appliedCount} applied
-              </button>
-            )}
-            {jobs.length > 0 && !loading && (
-              <button
-                onClick={runMatching}
-                className="text-xs text-primary hover:text-primary/80 transition-colors font-medium"
-              >
-                Refresh Matches
-              </button>
-            )}
-          </div>
+          {!loading && resumeUploaded && (
+            <button
+              onClick={runMatching}
+              className="text-xs text-primary hover:text-primary/80 transition-colors font-medium"
+            >
+              Refresh Matches
+            </button>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
           {loading
             ? Array.from({ length: 6 }).map((_, i) => <JobCardSkeleton key={i} />)
-            : visibleJobs.map((job, i) => (
+            : jobs.length === 0 && resumeUploaded
+            ? (
+              <div className="col-span-3 glass-panel p-12 text-center">
+                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">🎉</span>
+                </div>
+                <p className="text-sm font-semibold text-foreground mb-1">
+                  You've applied to all matches!
+                </p>
+                <p className="text-xs text-muted-foreground mb-4">
+                  Great job! Click below to find more opportunities.
+                </p>
+                <button
+                  onClick={runMatching}
+                  className="px-4 py-2 rounded-xl text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                >
+                  Find More Jobs
+                </button>
+              </div>
+            )
+            : jobs.map((job, i) => (
                 <JobCard
                   key={job.id}
                   job={job}
                   index={i}
                   onSelect={setSelectedJob}
-                  onApply={markApplied}
-                  isApplied={isApplied(job.id)}
+                  onApply={handleApply}
+                  isApplied={false}
                 />
-              ))}
+              ))
+          }
         </div>
       </div>
 
@@ -108,7 +147,7 @@ const Index = () => {
         job={selectedJob}
         userId={USER_ID}
         onClose={() => setSelectedJob(null)}
-        onApply={markApplied}
+        onApply={handleApply}
       />
     </div>
   );
